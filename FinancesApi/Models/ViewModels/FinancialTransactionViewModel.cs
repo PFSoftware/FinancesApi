@@ -13,14 +13,23 @@ namespace PFSoftware.FinancesApi.Models.ViewModels
         /// <summary>Date the <see cref="FinancialTransactionViewModel"/> occurred.</summary>
         public DateTime Date { get; set; }
 
+        /// <summary>The ID of the <see cref="PayeeViewModel"/>.</summary>
+        public int PayeeId { get; set; }
+
         /// <summary>The entity the <see cref="FinancialTransactionViewModel"/> revolves around.</summary>
-        public string Payee { get; set; }
+        public PayeeViewModel Payee { get; set; }
+
+        /// <summary>The ID of the <see cref="MajorCategoryViewModel"/>.</summary>
+        public int MajorCategoryId { get; set; }
 
         /// <summary>Primary category regarding the <see cref="FinancialTransactionViewModel"/>.</summary>
-        public string MajorCategory { get; set; }
+        public MajorCategoryViewModel MajorCategory { get; set; }
+
+        /// <summary>The ID of the <see cref="MinorCategoryViewModel"/>.</summary>
+        public int MinorCategoryId { get; set; }
 
         /// <summary>Secondary category regarding the <see cref="FinancialTransactionViewModel"/>.</summary>
-        public string MinorCategory { get; set; }
+        public MinorCategoryViewModel MinorCategory { get; set; }
 
         /// <summary>Extra information regarding the <see cref="FinancialTransactionViewModel"/>.</summary>
         public string Memo { get; set; }

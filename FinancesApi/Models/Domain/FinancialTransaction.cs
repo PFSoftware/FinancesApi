@@ -13,14 +13,23 @@ namespace PFSoftware.FinancesApi.Models.Domain
         /// <summary>Date the <see cref="FinancialTransaction"/> occurred.</summary>
         public DateTime Date { get; set; }
 
+        /// <summary>The ID of the payee.</summary>
+        public Payee PayeeId { get; set; }
+
         /// <summary>The entity the <see cref="FinancialTransaction"/> revolves around.</summary>
-        public string Payee { get; set; }
+        public Payee Payee { get; set; }
+
+        /// <summary>The ID of the major Category.</summary>
+        public int MajorCategoryId { get; set; }
 
         /// <summary>Primary category regarding the <see cref="FinancialTransaction"/>.</summary>
-        public string MajorCategory { get; set; }
+        public MajorCategory MajorCategory { get; set; }
+
+        /// <summary>The ID of the minor category.</summary>
+        public int MinorCategoryId { get; set; }
 
         /// <summary>Secondary category regarding the <see cref="FinancialTransaction"/>.</summary>
-        public string MinorCategory { get; set; }
+        public MinorCategory MinorCategory { get; set; }
 
         /// <summary>Extra information regarding the <see cref="FinancialTransaction"/>.</summary>
         public string Memo { get; set; }
@@ -31,7 +40,7 @@ namespace PFSoftware.FinancesApi.Models.Domain
         /// <summary>How much money entered the account during <see cref="FinancialTransaction"/>.</summary>
         public decimal Inflow { get; set; }
 
-        /// <summary>ID of the <see cref="Account"/> associated with the <see cref="FinancialTransaction"/>.</summary>
+        /// <summary>ID of the account associated with the <see cref="FinancialTransaction"/>.</summary>
         public int AccountId { get; set; }
 
         /// <summary>Account associated with the <see cref="FinancialTransaction"/>.</summary>
