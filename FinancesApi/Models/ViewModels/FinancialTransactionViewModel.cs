@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PFSoftware.FinancesApi.Models.ViewModels
 {
@@ -34,8 +31,11 @@ namespace PFSoftware.FinancesApi.Models.ViewModels
         /// <summary>How much money entered the account during <see cref="FinancialTransactionViewModel"/>.</summary>
         public decimal Inflow { get; set; }
 
-        /// <summary>Name of the account associated with the <see cref="FinancialTransactionViewModel"/>.</summary>
-        public string Account { get; set; }
+        /// <summary>ID of the <see cref="AccountViewModel"/> associated with the <see cref="FinancialTransactionViewModel"/>.</summary>
+        public int AccountId { get; set; }
+
+        /// <summary>Account associated with the <see cref="FinancialTransactionViewModel"/>.</summary>
+        public AccountViewModel Account { get; set; }
 
         #endregion Modifying Properties
 

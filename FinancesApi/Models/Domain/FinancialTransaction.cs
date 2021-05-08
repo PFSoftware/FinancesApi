@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PFSoftware.FinancesApi.Models.Domain
 {
@@ -34,8 +31,11 @@ namespace PFSoftware.FinancesApi.Models.Domain
         /// <summary>How much money entered the account during <see cref="FinancialTransaction"/>.</summary>
         public decimal Inflow { get; set; }
 
-        /// <summary>Name of the account associated with the <see cref="FinancialTransaction"/>.</summary>
-        public string Account { get; set; }
+        /// <summary>ID of the <see cref="Account"/> associated with the <see cref="FinancialTransaction"/>.</summary>
+        public int AccountId { get; set; }
+
+        /// <summary>Account associated with the <see cref="FinancialTransaction"/>.</summary>
+        public Account Account { get; set; }
 
         #endregion Modifying Properties
 
@@ -51,7 +51,7 @@ namespace PFSoftware.FinancesApi.Models.Domain
                    && string.Equals(left.MinorCategory, right.MinorCategory, StringComparison.OrdinalIgnoreCase)
                    && string.Equals(left.Memo, right.Memo, StringComparison.OrdinalIgnoreCase)
                    && left.Outflow == right.Outflow && left.Inflow == right.Inflow
-                   && string.Equals(left.Account, right.Account, StringComparison.OrdinalIgnoreCase);
+                   && left.Account == right.Account;
         }
 
         public sealed override bool Equals(object obj) => Equals(this, obj as FinancialTransaction);

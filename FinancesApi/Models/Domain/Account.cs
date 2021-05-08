@@ -2,13 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PFSoftware.FinancesApi.Models.Domain
 {
     /// <summary>Represents an account where money is credited/debited.</summary>
     public class Account
     {
+        /// <summary>ID of the <see cref="Account"/>.</summary>
+        public int Id { get; set; }
+
         /// <summary>Name of the <see cref="Account"/>.</summary>
         public string Name { get; set; }
 
@@ -33,7 +35,7 @@ namespace PFSoftware.FinancesApi.Models.Domain
         /// <param name="transaction">Transaction to replace current in list</param>
         internal void ModifyTransaction(int index, FinancialTransaction transaction)
         {
-            if (transaction.Account == Name)
+            if (transaction.Account.Name == Name)
                 AllTransactions[index] = transaction;
             else
                 RemoveTransaction(index);

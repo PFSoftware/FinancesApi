@@ -1,16 +1,17 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PFSoftware.FinancesApi.Constants;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PFSoftware.FinancesApi.Models.ViewModels
 {
     /// <summary>Represents an account where money is credited/debited.</summary>
     public class AccountViewModel
     {
+        /// <summary>ID of the <see cref="AccountViewModel"/>.</summary>
+        public int Id { get; set; }
+
         /// <summary>Name of the <see cref="AccountViewModel"/>.</summary>
         public string Name { get; set; }
 
