@@ -1,56 +1,22 @@
-﻿using System;
+﻿using PFSoftware.FinancesApi.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PFSoftware.FinancesApi.Models
+namespace PFSoftware.FinancesApi.Models.Domain
 {
     /// <summary>Represents an account where money is credited/debited.</summary>
     public class Account
     {
-        #region Modifying Properties
-
         /// <summary>Name of the <see cref="Account"/>.</summary>
         public string Name { get; set; }
 
         /// <summary>Type of the <see cref="Account"/>.</summary>
         public AccountType AccountType { get; set; }
 
-        #endregion Modifying Properties
-
-        #region Helper Properties
-
-        /// <summary>Type of the account, formatted</summary>
-        public string Type
-        {
-            get
-            {
-                return AccountType switch
-                {
-                    AccountType.Cash => "Cash",
-                    AccountType.Checking => "Checking",
-                    AccountType.CreditCard => "Credit Card",
-                    AccountType.Merchant => "Merchant",
-                    AccountType.Prepaid => "Prepaid",
-                    AccountType.Savings => "Savings",
-                    _ => "Invalid Account Type",
-                };
-            }
-        }
-
         /// <summary>Collection of all the transactions in the account</summary>
         public List<FinancialTransaction> AllTransactions { get; set; } = new List<FinancialTransaction>();
-
-        /// <summary>Balance of the account</summary>
-        public decimal Balance => AllTransactions.Sum(transaction => (-1 * transaction.Outflow) + transaction.Inflow);
-
-        /// <summary>Balance of the account, formatted to currency</summary>
-        public string BalanceToString => Balance.ToString("C2");
-
-        /// <summary>Balance of the account, formatted to currency, with preceding text</summary>
-        public string BalanceToStringWithText => $"Balance: {BalanceToString}";
-
-        #endregion Helper Properties
 
         #region Transaction Management
 
@@ -94,7 +60,7 @@ namespace PFSoftware.FinancesApi.Models
         {
             if (left is null && right is null) return true;
             if (left is null ^ right is null) return false;
-            return string.Equals(left.Name, right.Name, StringComparison.OrdinalIgnoreCase) && left.AccountType == right.AccountType && left.Balance == right.Balance && (left.AllTransactions.Count == right.AllTransactions.Count && !left.AllTransactions.Except(right.AllTransactions).Any());
+            return string.Equals(left.Name, right.Name, StringComparison.OrdinalIgnoreCase) && left.AccountType == right.AccountType && (left.AllTransactions.Count == right.AllTransactions.Count && !left.AllTransactions.Except(right.AllTransactions).Any());
         }
 
         public sealed override bool Equals(object obj) => Equals(this, obj as Account);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PFSoftware.FinancesApi.Models
+namespace PFSoftware.FinancesApi.Models.Domain
 {
     /// <summary>Represents a monetary transaction in an account.</summary>
     public class FinancialTransaction
@@ -39,19 +39,6 @@ namespace PFSoftware.FinancesApi.Models
 
         #endregion Modifying Properties
 
-        #region Helper Properties
-
-        /// <summary>Date the transaction occurred, formatted properly</summary>
-        public string DateToString => Date.ToString("yyyy/MM/dd");
-
-        /// <summary>How much money entered the account during Transaction, formatted to currency</summary>
-        public string InflowToString => Inflow.ToString("C2");
-
-        /// <summary>How much money left the account during Transaction, formatted to currency</summary>
-        public string OutflowToString => Outflow.ToString("C2");
-
-        #endregion Helper Properties
-
         #region Override Operators
 
         private static bool Equals(FinancialTransaction left, FinancialTransaction right)
@@ -76,8 +63,6 @@ namespace PFSoftware.FinancesApi.Models
         public static bool operator !=(FinancialTransaction left, FinancialTransaction right) => !Equals(left, right);
 
         public sealed override int GetHashCode() => base.GetHashCode() ^ 17;
-
-        public sealed override string ToString() => string.Join(" - ", DateToString, Account, Payee);
 
         #endregion Override Operators
     }
