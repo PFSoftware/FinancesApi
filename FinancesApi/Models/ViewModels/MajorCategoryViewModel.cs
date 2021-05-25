@@ -11,7 +11,7 @@ namespace PFSoftware.FinancesApi.Models.ViewModels
         /// <summary>Name of <see cref="MajorCategoryViewModel"/>.</summary>
         public string Name { get; set; }
 
-        /// <summary>List of <see cref="MinorCategory"/> related to the <see cref="MajorCategoryViewModel"/>.</summary>
+        /// <summary>List of <see cref="MinorCategoryViewModel"/> related to the <see cref="MajorCategoryViewModel"/>.</summary>
         public List<MinorCategoryViewModel> MinorCategories { get; set; } = new List<MinorCategoryViewModel>();
 
         public override string ToString() => Name;

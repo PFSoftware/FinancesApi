@@ -20,10 +20,10 @@ namespace PFSoftware.FinancesApi.Models.ViewModels
         public AccountType AccountType { get; set; }
 
         /// <summary>Collection of all the transactions in the account</summary>
-        public List<FinancialTransactionViewModel> AllTransactions { get; set; } = new List<FinancialTransactionViewModel>();
+        public List<FinancialTransactionViewModel> Transactions { get; set; } = new List<FinancialTransactionViewModel>();
 
         /// <summary>Balance of the account</summary>
-        public decimal Balance => AllTransactions.Sum(transaction => (-1 * transaction.Outflow) + transaction.Inflow);
+        public decimal Balance => Transactions.Sum(transaction => (-1 * transaction.Outflow) + transaction.Inflow);
 
         /// <summary>Balance of the account, formatted to currency</summary>
         public string BalanceToString => Balance.ToString("C2");

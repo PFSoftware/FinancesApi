@@ -1,20 +1,21 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace PFSoftware.FinancesApi.Models.Domain
 {
     /// <summary>Represents a monetary transaction in an account.</summary>
     public class FinancialTransaction
     {
-        #region Modifying Properties
-
         /// <summary>ID of the <see cref="FinancialTransaction"/>.</summary>
+        [Key]
         public int Id { get; set; }
 
         /// <summary>Date the <see cref="FinancialTransaction"/> occurred.</summary>
+        [Required]
         public DateTime Date { get; set; }
 
         /// <summary>The ID of the payee.</summary>
-        public Payee PayeeId { get; set; }
+        public int PayeeId { get; set; }
 
         /// <summary>The entity the <see cref="FinancialTransaction"/> revolves around.</summary>
         public Payee Payee { get; set; }
@@ -46,21 +47,18 @@ namespace PFSoftware.FinancesApi.Models.Domain
         /// <summary>Account associated with the <see cref="FinancialTransaction"/>.</summary>
         public Account Account { get; set; }
 
-        #endregion Modifying Properties
-
-        #region Override Operators
-
         private static bool Equals(FinancialTransaction left, FinancialTransaction right)
         {
             if (left is null && right is null) return true;
             if (left is null ^ right is null) return false;
             return left.Id == right.Id && DateTime.Equals(left.Date, right.Date)
-                   && string.Equals(left.Payee, right.Payee, StringComparison.OrdinalIgnoreCase)
-                   && string.Equals(left.MajorCategory, right.MajorCategory, StringComparison.OrdinalIgnoreCase)
-                   && string.Equals(left.MinorCategory, right.MinorCategory, StringComparison.OrdinalIgnoreCase)
+                   && left.PayeeId == right.PayeeId
+                   && left.MajorCategoryId == right.MajorCategoryId
+                   && left.MinorCategoryId == right.MinorCategoryId
                    && string.Equals(left.Memo, right.Memo, StringComparison.OrdinalIgnoreCase)
-                   && left.Outflow == right.Outflow && left.Inflow == right.Inflow
-                   && left.Account == right.Account;
+                   && left.Outflow == right.Outflow
+                   && left.Inflow == right.Inflow
+                   && left.AccountId == right.AccountId;
         }
 
         public sealed override bool Equals(object obj) => Equals(this, obj as FinancialTransaction);
@@ -72,7 +70,5 @@ namespace PFSoftware.FinancesApi.Models.Domain
         public static bool operator !=(FinancialTransaction left, FinancialTransaction right) => !Equals(left, right);
 
         public sealed override int GetHashCode() => base.GetHashCode() ^ 17;
-
-        #endregion Override Operators
     }
 }

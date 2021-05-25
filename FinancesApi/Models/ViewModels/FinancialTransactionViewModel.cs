@@ -48,18 +48,14 @@ namespace PFSoftware.FinancesApi.Models.ViewModels
 
         #endregion Modifying Properties
 
-        #region Helper Properties
-
         /// <summary>Date the transaction occurred, formatted properly</summary>
-        public string DateToString => Date.ToString("yyyy/MM/dd");
+        public string DateToString => Date.ToString("yyyy-MM-dd");
 
         /// <summary>How much money entered the account during Transaction, formatted to currency</summary>
         public string InflowToString => Inflow.ToString("C2");
 
         /// <summary>How much money left the account during Transaction, formatted to currency</summary>
         public string OutflowToString => Outflow.ToString("C2");
-
-        #endregion Helper Properties
 
         public sealed override string ToString() => string.Join(" - ", DateToString, Account, Payee);
     }
