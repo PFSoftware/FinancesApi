@@ -1,17 +1,71 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using PFSoftware.FinancesApi.Data;
+using PFSoftware.FinancesApi.Models.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace PFSoftware.FinancesApi.Services
 {
     public class FinancialTransactionService
     {
-        //TODO Implement AccountController
+        //TODO Implement FinancialTransactionController
         //TODO Implement FinancialTransactionService/Controller
         //TODO Implement MajorCategoryService/Controller
         //TODO Implement MinorCategoryService/Controller
         //TODO Implement PayeeService/Controller
         //TODO Migrations
+
+        private readonly AppDbContext _context;
+
+        public FinancialTransactionService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public void CreateFinancialTransaction(FinancialTransaction financialTransaction)
+        {
+            if (financialTransaction == null)
+                throw new ArgumentNullException(nameof(financialTransaction));
+
+            _context.FinancialTransactions.Add(financialTransaction);
+            _context.SaveChanges();
+        }
+
+        public void DeleteFinancialTransaction(FinancialTransaction financialTransaction)
+        {
+            if (financialTransaction == null)
+                throw new ArgumentNullException(nameof(financialTransaction));
+
+            _context.FinancialTransactions.Remove(financialTransaction);
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<FinancialTransaction> GetAllFinancialTransactions()
+        {
+            return _context
+                .FinancialTransactions
+                .Include(x => x.Account)
+                .Include(x => x.MajorCategory)
+                .Include(x => x.MinorCategory)
+                .Include(x => x.Payee)
+                .ToList();
+        }
+
+        public FinancialTransaction GetFinancialTransactionById(int id)
+        {
+            return _context
+                .FinancialTransactions
+                .Include(x => x.Account)
+                .Include(x => x.MajorCategory)
+                .Include(x => x.MinorCategory)
+                .Include(x => x.Payee)
+                .FirstOrDefault(v => v.Id == id);
+        }
+
+        public void UpdateFinancialTransaction(int id, FinancialTransaction financialTransaction)
+        {
+            //Nothing
+        }
     }
 }

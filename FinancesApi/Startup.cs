@@ -28,6 +28,10 @@ namespace PFSoftware.FinancesApi
             services.AddDbContext<AppDbContext>(options => options.UseSqlite("DataSource=DevDatabase.db"));
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddScoped<AccountService>();
+            services.AddScoped<FinancialTransactionService>();
+            services.AddScoped<MajorCategoryService>();
+            services.AddScoped<MinorCategoryService>();
+            services.AddScoped<PayeeService>();
 
             services.AddScoped<DevDbSeeder>();
         }
