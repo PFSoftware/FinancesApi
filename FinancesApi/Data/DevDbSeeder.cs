@@ -65,12 +65,12 @@ namespace PFSoftware.FinancesApi.Data
 
         private async Task SeedPayees()
         {
-            _context.Payees.Add(new Payee { Name = "Income" });
-            _context.Payees.Add(new Payee { Name = "Taco Bell" });
-            _context.Payees.Add(new Payee { Name = "Walmart" });
-            _context.Payees.Add(new Payee { Name = "Electric Company" });
-            _context.Payees.Add(new Payee { Name = "Transfer" });
-            _context.Payees.Add(new Payee { Name = "Landlord" });
+            _context.Payees.Add(new Payee { Id = 1, Name = "Income" });
+            _context.Payees.Add(new Payee { Id = 2, Name = "Taco Bell" });
+            _context.Payees.Add(new Payee { Id = 3, Name = "Walmart" });
+            _context.Payees.Add(new Payee { Id = 4, Name = "Electric Company" });
+            _context.Payees.Add(new Payee { Id = 5, Name = "Transfer" });
+            _context.Payees.Add(new Payee { Id = 6, Name = "Landlord" });
 
             await _context.SaveChangesAsync();
         }

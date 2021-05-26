@@ -38,7 +38,9 @@ namespace PFSoftware.FinancesApi.Services
         {
             return _context
                 .Accounts
-                .Include(x => x.Transactions)
+                .Include(x => x.Transactions).ThenInclude(x => x.MajorCategory)
+                .Include(x => x.Transactions).ThenInclude(x => x.MinorCategory)
+                .Include(x => x.Transactions).ThenInclude(x => x.Payee)
                 .ToList();
         }
 

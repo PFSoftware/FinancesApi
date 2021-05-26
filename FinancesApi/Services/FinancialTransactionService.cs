@@ -9,13 +9,6 @@ namespace PFSoftware.FinancesApi.Services
 {
     public class FinancialTransactionService
     {
-        //TODO Implement FinancialTransactionController
-        //TODO Implement FinancialTransactionService/Controller
-        //TODO Implement MajorCategoryService/Controller
-        //TODO Implement MinorCategoryService/Controller
-        //TODO Implement PayeeService/Controller
-        //TODO Migrations
-
         private readonly AppDbContext _context;
 
         public FinancialTransactionService(AppDbContext context)
