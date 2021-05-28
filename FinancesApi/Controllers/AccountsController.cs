@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using PFSoftware.FinancesApi.Models.ViewModels;
 using PFSoftware.FinancesApi.Services;
@@ -34,64 +35,40 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpGet("{id}", Name = "GetAccountById")]
         public ActionResult<AccountViewModel> GetAccountById(int id)
         {
-            Account AccountItem = _service.GetAccountById(id);
-            if (AccountItem != null)
-            {
-                return Ok(_mapper.Map<AccountViewModel>(AccountItem));
-            }
+            Account account = _service.GetAccountById(id);
+            if (account != null)
+                return Ok(_mapper.Map<AccountViewModel>(account));
+
             return NotFound();
         }
 
         //POST api/accounts
         [HttpPost]
-        public ActionResult<AccountViewModel> CreateAccount(Account account)
+        public ActionResult<AccountViewModel> CreateAccount(CreateEditAccountRequest request)
         {
-            Account accountModel = _mapper.Map<Account>(account);
-            _service.CreateAccount(accountModel);
+            if (string.IsNullOrWhiteSpace(request.Name) || request.AccountType == Constants.AccountType.None)
+                return Problem("A valid name and accountType are required. Valid account types include: Cash, Checking, CreditCard, Merchant, Prepaid, Savings.");
 
-            var AccountViewModel = _mapper.Map<AccountViewModel>(accountModel);
+            Account newAccount = _mapper.Map<Account>(request);
+            _service.CreateAccount(newAccount);
+
+            AccountViewModel AccountViewModel = _mapper.Map<AccountViewModel>(newAccount);
 
             return CreatedAtRoute(nameof(GetAccountById), new { Id = AccountViewModel.Id }, AccountViewModel);
         }
 
-        //PUT api/accounts/{id}
-        [HttpPut("{id}")]
-        public ActionResult UpdateAccount(int id, Account account)
+        //POST api/accounts/{id}
+        [HttpPost("{id}")]
+        public ActionResult UpdateAccount(int id, CreateEditAccountRequest request)
         {
-            Account accountModelFromRepo = _service.GetAccountById(id);
-            if (accountModelFromRepo == null)
-            {
+            Account account = _service.GetAccountById(id);
+            if (account == null)
                 return NotFound();
-            }
-            _mapper.Map(account, accountModelFromRepo);
 
-            _service.UpdateAccount(id, accountModelFromRepo);
+            if (request.Id != null && request.Id != id)
+                return ValidationProblem("The ID in the model doesn't match the ID the request was made on.");
 
-            return NoContent();
-        }
-
-        //PATCH api/accounts/{id}
-        [HttpPatch("{id}")]
-        public ActionResult PartialAccountUpdate(int id, JsonPatchDocument<Account> patchDoc)
-        {
-            var accountModelFromRepo = _service.GetAccountById(id);
-            if (accountModelFromRepo == null)
-            {
-                return NotFound();
-            }
-
-            var AccountToPatch = _mapper.Map<Account>(accountModelFromRepo);
-            patchDoc.ApplyTo(AccountToPatch, ModelState);
-
-            if (!TryValidateModel(AccountToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            _mapper.Map(AccountToPatch, accountModelFromRepo);
-
-            _service.UpdateAccount(id, accountModelFromRepo);
-
+            _service.UpdateAccount(request, account);
             return NoContent();
         }
 
@@ -99,13 +76,11 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteAccount(int id)
         {
-            var accountModelFromRepo = _service.GetAccountById(id);
-            if (accountModelFromRepo == null)
-            {
+            Account account = _service.GetAccountById(id);
+            if (account == null)
                 return NotFound();
-            }
-            _service.DeleteAccount(accountModelFromRepo);
 
+            _service.DeleteAccount(account);
             return NoContent();
         }
     }

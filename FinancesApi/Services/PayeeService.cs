@@ -1,4 +1,5 @@
 ﻿using PFSoftware.FinancesApi.Data;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using System;
 using System.Collections.Generic;
@@ -43,9 +44,11 @@ namespace PFSoftware.FinancesApi.Services
             return _context.Payees.FirstOrDefault(v => v.Id == id);
         }
 
-        public void UpdatePayee(int id, Payee payee)
+        public void UpdatePayee(CreateEditPayeeRequest request, Payee payee)
         {
-            //Nothing
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                payee.Name = request.Name;
+            _context.SaveChanges();
         }
     }
 }

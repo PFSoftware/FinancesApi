@@ -15,18 +15,21 @@ namespace PFSoftware.FinancesApi.Models.Domain
         public DateTime Date { get; set; }
 
         /// <summary>The ID of the payee.</summary>
+        [Required]
         public int PayeeId { get; set; }
 
         /// <summary>The entity the <see cref="FinancialTransaction"/> revolves around.</summary>
         public Payee Payee { get; set; }
 
         /// <summary>The ID of the major Category.</summary>
+        [Required]
         public int MajorCategoryId { get; set; }
 
         /// <summary>Primary category regarding the <see cref="FinancialTransaction"/>.</summary>
         public MajorCategory MajorCategory { get; set; }
 
         /// <summary>The ID of the minor category.</summary>
+        [Required]
         public int MinorCategoryId { get; set; }
 
         /// <summary>Secondary category regarding the <see cref="FinancialTransaction"/>.</summary>
@@ -42,6 +45,7 @@ namespace PFSoftware.FinancesApi.Models.Domain
         public decimal Inflow { get; set; }
 
         /// <summary>ID of the account associated with the <see cref="FinancialTransaction"/>.</summary>
+        [Required]
         public int AccountId { get; set; }
 
         /// <summary>Account associated with the <see cref="FinancialTransaction"/>.</summary>
@@ -51,14 +55,15 @@ namespace PFSoftware.FinancesApi.Models.Domain
         {
             if (left is null && right is null) return true;
             if (left is null ^ right is null) return false;
-            return left.Id == right.Id && DateTime.Equals(left.Date, right.Date)
-                   && left.PayeeId == right.PayeeId
-                   && left.MajorCategoryId == right.MajorCategoryId
-                   && left.MinorCategoryId == right.MinorCategoryId
-                   && string.Equals(left.Memo, right.Memo, StringComparison.OrdinalIgnoreCase)
-                   && left.Outflow == right.Outflow
-                   && left.Inflow == right.Inflow
-                   && left.AccountId == right.AccountId;
+            return left.Id == right.Id
+                && DateTime.Equals(left.Date, right.Date)
+                && left.PayeeId == right.PayeeId
+                && left.MajorCategoryId == right.MajorCategoryId
+                && left.MinorCategoryId == right.MinorCategoryId
+                && string.Equals(left.Memo, right.Memo, StringComparison.OrdinalIgnoreCase)
+                && left.Outflow == right.Outflow
+                && left.Inflow == right.Inflow
+                && left.AccountId == right.AccountId;
         }
 
         public sealed override bool Equals(object obj) => Equals(this, obj as FinancialTransaction);

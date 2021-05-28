@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using PFSoftware.FinancesApi.Models.ViewModels;
 using PFSoftware.FinancesApi.Services;
@@ -34,63 +35,40 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpGet("{id}", Name = "GetMinorCategoryById")]
         public ActionResult<MinorCategoryViewModel> GetMinorCategoryById(int id)
         {
-            MinorCategory MinorCategoryItem = _service.GetMinorCategoryById(id);
-            if (MinorCategoryItem != null)
-            {
-                return Ok(_mapper.Map<MinorCategoryViewModel>(MinorCategoryItem));
-            }
+            MinorCategory minorCategoryItem = _service.GetMinorCategoryById(id);
+            if (minorCategoryItem != null)
+                return Ok(_mapper.Map<MinorCategoryViewModel>(minorCategoryItem));
+
             return NotFound();
         }
 
         //POST api/minorCategories
         [HttpPost]
-        public ActionResult<MinorCategoryViewModel> CreateMinorCategory(MinorCategory minorCategory)
+        public ActionResult<MinorCategoryViewModel> CreateMinorCategory(CreateEditMinorCategoryRequest request)
         {
-            MinorCategory minorCategoryModel = _mapper.Map<MinorCategory>(minorCategory);
-            _service.CreateMinorCategory(minorCategoryModel);
+            if (string.IsNullOrWhiteSpace(request.Name) || request.MajorCategoryId == 0)
+                return Problem("A valid name and majorCategoryId is required.");
 
-            var MinorCategoryViewModel = _mapper.Map<MinorCategoryViewModel>(minorCategoryModel);
+            MinorCategory newMinorCategory = _mapper.Map<MinorCategory>(request);
+            _service.CreateMinorCategory(newMinorCategory);
 
-            return CreatedAtRoute(nameof(GetMinorCategoryById), new { Id = MinorCategoryViewModel.Id }, MinorCategoryViewModel);
+            MinorCategoryViewModel minorCategoryViewModel = _mapper.Map<MinorCategoryViewModel>(newMinorCategory);
+
+            return CreatedAtRoute(nameof(GetMinorCategoryById), new { Id = minorCategoryViewModel.Id }, minorCategoryViewModel);
         }
 
-        //PUT api/minorCategories/{id}
-        [HttpPut("{id}")]
-        public ActionResult UpdateMinorCategory(int id, MinorCategory minorCategory)
+        //POST api/minorCategories/{id}
+        [HttpPost("{id}")]
+        public ActionResult UpdateMinorCategory(int id, CreateEditMinorCategoryRequest request)
         {
-            MinorCategory minorCategoryModelFromRepo = _service.GetMinorCategoryById(id);
-            if (minorCategoryModelFromRepo == null)
-            {
+            MinorCategory minorCategory = _service.GetMinorCategoryById(id);
+            if (minorCategory == null)
                 return NotFound();
-            }
-            _mapper.Map(minorCategory, minorCategoryModelFromRepo);
 
-            _service.UpdateMinorCategory(id, minorCategoryModelFromRepo);
+            if (request.Id != null && request.Id != id)
+                return ValidationProblem("The ID in the model doesn't match the ID the request was made on.");
 
-            return NoContent();
-        }
-
-        //PATCH api/minorCategories/{id}
-        [HttpPatch("{id}")]
-        public ActionResult PartialMinorCategoryUpdate(int id, JsonPatchDocument<MinorCategory> patchDoc)
-        {
-            var minorCategoryModelFromRepo = _service.GetMinorCategoryById(id);
-            if (minorCategoryModelFromRepo == null)
-            {
-                return NotFound();
-            }
-
-            var MinorCategoryToPatch = _mapper.Map<MinorCategory>(minorCategoryModelFromRepo);
-            patchDoc.ApplyTo(MinorCategoryToPatch, ModelState);
-
-            if (!TryValidateModel(MinorCategoryToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            _mapper.Map(MinorCategoryToPatch, minorCategoryModelFromRepo);
-
-            _service.UpdateMinorCategory(id, minorCategoryModelFromRepo);
+            _service.UpdateMinorCategory(request, minorCategory);
 
             return NoContent();
         }
@@ -99,13 +77,11 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteMinorCategory(int id)
         {
-            var minorCategoryModelFromRepo = _service.GetMinorCategoryById(id);
-            if (minorCategoryModelFromRepo == null)
-            {
+            MinorCategory minorCategory = _service.GetMinorCategoryById(id);
+            if (minorCategory == null)
                 return NotFound();
-            }
-            _service.DeleteMinorCategory(minorCategoryModelFromRepo);
 
+            _service.DeleteMinorCategory(minorCategory);
             return NoContent();
         }
     }

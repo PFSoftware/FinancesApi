@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using PFSoftware.FinancesApi.Models.ViewModels;
 using PFSoftware.FinancesApi.Services;
+using System;
 using System.Collections.Generic;
 
 namespace PFSoftware.FinancesApi.Controllers
@@ -36,62 +38,38 @@ namespace PFSoftware.FinancesApi.Controllers
         {
             FinancialTransaction FinancialTransactionItem = _service.GetFinancialTransactionById(id);
             if (FinancialTransactionItem != null)
-            {
                 return Ok(_mapper.Map<FinancialTransactionViewModel>(FinancialTransactionItem));
-            }
+
             return NotFound();
         }
 
         //POST api/financialTransactions
         [HttpPost]
-        public ActionResult<FinancialTransactionViewModel> CreateFinancialTransaction(FinancialTransaction financialTransaction)
+        public ActionResult<FinancialTransactionViewModel> CreateFinancialTransaction(CreateEditFinancialTransactionRequest request)
         {
-            FinancialTransaction financialTransactionModel = _mapper.Map<FinancialTransaction>(financialTransaction);
-            _service.CreateFinancialTransaction(financialTransactionModel);
+            if (request.Date == DateTime.MinValue || request.PayeeId == 0 || request.MajorCategoryId == 0 || request.MinorCategoryId == 0 || request.AccountId == 0)
+                return Problem("Financial transactions require valid input for date, payeeId, majorCategoryId, minorCategoryId, and accountId.");
 
-            var FinancialTransactionViewModel = _mapper.Map<FinancialTransactionViewModel>(financialTransactionModel);
+            FinancialTransaction newFinancialTransaction = _mapper.Map<FinancialTransaction>(request);
+            _service.CreateFinancialTransaction(newFinancialTransaction);
 
-            return CreatedAtRoute(nameof(GetFinancialTransactionById), new { Id = FinancialTransactionViewModel.Id }, FinancialTransactionViewModel);
+            FinancialTransactionViewModel financialTransactionViewModel = _mapper.Map<FinancialTransactionViewModel>(newFinancialTransaction);
+
+            return CreatedAtRoute(nameof(GetFinancialTransactionById), new { Id = financialTransactionViewModel.Id }, financialTransactionViewModel);
         }
 
-        //PUT api/financialTransactions/{id}
-        [HttpPut("{id}")]
-        public ActionResult UpdateFinancialTransaction(int id, FinancialTransaction financialTransaction)
+        //POST api/financialTransactions/{id}
+        [HttpPost("{id}")]
+        public ActionResult UpdateFinancialTransaction(int id, CreateEditFinancialTransactionRequest request)
         {
-            FinancialTransaction financialTransactionModelFromRepo = _service.GetFinancialTransactionById(id);
-            if (financialTransactionModelFromRepo == null)
-            {
+            FinancialTransaction financialTransaction = _service.GetFinancialTransactionById(id);
+            if (financialTransaction == null)
                 return NotFound();
-            }
-            _mapper.Map(financialTransaction, financialTransactionModelFromRepo);
 
-            _service.UpdateFinancialTransaction(id, financialTransactionModelFromRepo);
+            if (request.Id != null && request.Id != id)
+                return ValidationProblem("The ID in the model doesn't match the ID the request was made on.");
 
-            return NoContent();
-        }
-
-        //PATCH api/financialTransactions/{id}
-        [HttpPatch("{id}")]
-        public ActionResult PartialFinancialTransactionUpdate(int id, JsonPatchDocument<FinancialTransaction> patchDoc)
-        {
-            var financialTransactionModelFromRepo = _service.GetFinancialTransactionById(id);
-            if (financialTransactionModelFromRepo == null)
-            {
-                return NotFound();
-            }
-
-            var FinancialTransactionToPatch = _mapper.Map<FinancialTransaction>(financialTransactionModelFromRepo);
-            patchDoc.ApplyTo(FinancialTransactionToPatch, ModelState);
-
-            if (!TryValidateModel(FinancialTransactionToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            _mapper.Map(FinancialTransactionToPatch, financialTransactionModelFromRepo);
-
-            _service.UpdateFinancialTransaction(id, financialTransactionModelFromRepo);
-
+            _service.UpdateFinancialTransaction(request, financialTransaction);
             return NoContent();
         }
 
@@ -99,13 +77,11 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteFinancialTransaction(int id)
         {
-            var financialTransactionModelFromRepo = _service.GetFinancialTransactionById(id);
-            if (financialTransactionModelFromRepo == null)
-            {
+            FinancialTransaction financialTransaction = _service.GetFinancialTransactionById(id);
+            if (financialTransaction == null)
                 return NotFound();
-            }
-            _service.DeleteFinancialTransaction(financialTransactionModelFromRepo);
 
+            _service.DeleteFinancialTransaction(financialTransaction);
             return NoContent();
         }
     }

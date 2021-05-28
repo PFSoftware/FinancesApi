@@ -5,6 +5,10 @@ namespace PFSoftware.FinancesApi.Constants
     /// <summary>Represents the various types of accounts available to select.</summary>
     public enum AccountType
     {
+        /// <summary>Invalid account type.</summary>
+        [EnumMember(Value = "None")]
+        None = 0,
+
         /// <summary>Cash carried on hand.</summary>
         [EnumMember(Value = "Cash")]
         Cash,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PFSoftware.FinancesApi.Data;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using System;
 using System.Collections.Generic;
@@ -50,9 +51,13 @@ namespace PFSoftware.FinancesApi.Services
                 .FirstOrDefault(v => v.Id == id);
         }
 
-        public void UpdateMajorCategory(int id, MajorCategory majorCategory)
+        public void UpdateMajorCategory(CreateEditMajorCategoryRequest request, MajorCategory majorCategory)
         {
-            //Nothing
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                majorCategory.Name = request.Name;
+            if (request.MinorCategories != null && request.MinorCategories.Count > 0)
+                majorCategory.MinorCategories = new List<MinorCategory>(request.MinorCategories);
+            _context.SaveChanges();
         }
     }
 }

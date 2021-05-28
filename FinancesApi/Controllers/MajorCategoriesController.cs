@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using PFSoftware.FinancesApi.Models.ViewModels;
 using PFSoftware.FinancesApi.Services;
@@ -36,62 +37,38 @@ namespace PFSoftware.FinancesApi.Controllers
         {
             MajorCategory MajorCategoryItem = _service.GetMajorCategoryById(id);
             if (MajorCategoryItem != null)
-            {
                 return Ok(_mapper.Map<MajorCategoryViewModel>(MajorCategoryItem));
-            }
+
             return NotFound();
         }
 
         //POST api/majorCategories
         [HttpPost]
-        public ActionResult<MajorCategoryViewModel> CreateMajorCategory(MajorCategory majorCategory)
+        public ActionResult<MajorCategoryViewModel> CreateMajorCategory(CreateEditMajorCategoryRequest request)
         {
-            MajorCategory majorCategoryModel = _mapper.Map<MajorCategory>(majorCategory);
-            _service.CreateMajorCategory(majorCategoryModel);
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return Problem("A valid name is required.");
 
-            var MajorCategoryViewModel = _mapper.Map<MajorCategoryViewModel>(majorCategoryModel);
+            MajorCategory newMajorCategory = _mapper.Map<MajorCategory>(request);
+            _service.CreateMajorCategory(newMajorCategory);
+
+            MajorCategoryViewModel MajorCategoryViewModel = _mapper.Map<MajorCategoryViewModel>(newMajorCategory);
 
             return CreatedAtRoute(nameof(GetMajorCategoryById), new { Id = MajorCategoryViewModel.Id }, MajorCategoryViewModel);
         }
 
-        //PUT api/majorCategories/{id}
-        [HttpPut("{id}")]
-        public ActionResult UpdateMajorCategory(int id, MajorCategory majorCategory)
+        //POST api/majorCategories/{id}
+        [HttpPost("{id}")]
+        public ActionResult UpdateMajorCategory(int id, CreateEditMajorCategoryRequest request)
         {
-            MajorCategory majorCategoryModelFromRepo = _service.GetMajorCategoryById(id);
-            if (majorCategoryModelFromRepo == null)
-            {
+            MajorCategory majorCategory = _service.GetMajorCategoryById(id);
+            if (majorCategory == null)
                 return NotFound();
-            }
-            _mapper.Map(majorCategory, majorCategoryModelFromRepo);
 
-            _service.UpdateMajorCategory(id, majorCategoryModelFromRepo);
+            if (request.Id != null && request.Id != id)
+                return ValidationProblem("The ID in the model doesn't match the ID the request was made on.");
 
-            return NoContent();
-        }
-
-        //PATCH api/majorCategories/{id}
-        [HttpPatch("{id}")]
-        public ActionResult PartialMajorCategoryUpdate(int id, JsonPatchDocument<MajorCategory> patchDoc)
-        {
-            var majorCategoryModelFromRepo = _service.GetMajorCategoryById(id);
-            if (majorCategoryModelFromRepo == null)
-            {
-                return NotFound();
-            }
-
-            var MajorCategoryToPatch = _mapper.Map<MajorCategory>(majorCategoryModelFromRepo);
-            patchDoc.ApplyTo(MajorCategoryToPatch, ModelState);
-
-            if (!TryValidateModel(MajorCategoryToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            _mapper.Map(MajorCategoryToPatch, majorCategoryModelFromRepo);
-
-            _service.UpdateMajorCategory(id, majorCategoryModelFromRepo);
-
+            _service.UpdateMajorCategory(request, majorCategory);
             return NoContent();
         }
 
@@ -99,13 +76,11 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteMajorCategory(int id)
         {
-            var majorCategoryModelFromRepo = _service.GetMajorCategoryById(id);
+            MajorCategory majorCategoryModelFromRepo = _service.GetMajorCategoryById(id);
             if (majorCategoryModelFromRepo == null)
-            {
                 return NotFound();
-            }
-            _service.DeleteMajorCategory(majorCategoryModelFromRepo);
 
+            _service.DeleteMajorCategory(majorCategoryModelFromRepo);
             return NoContent();
         }
     }

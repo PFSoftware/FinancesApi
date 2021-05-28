@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using PFSoftware.FinancesApi.Models.ViewModels;
 using PFSoftware.FinancesApi.Services;
@@ -36,62 +37,38 @@ namespace PFSoftware.FinancesApi.Controllers
         {
             Payee PayeeItem = _service.GetPayeeById(id);
             if (PayeeItem != null)
-            {
                 return Ok(_mapper.Map<PayeeViewModel>(PayeeItem));
-            }
+
             return NotFound();
         }
 
         //POST api/payees
         [HttpPost]
-        public ActionResult<PayeeViewModel> CreatePayee(Payee payee)
+        public ActionResult<PayeeViewModel> CreatePayee(CreateEditPayeeRequest request)
         {
-            Payee payeeModel = _mapper.Map<Payee>(payee);
-            _service.CreatePayee(payeeModel);
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return Problem("A valid name is required.");
 
-            var PayeeViewModel = _mapper.Map<PayeeViewModel>(payeeModel);
+            Payee payee = _mapper.Map<Payee>(request);
+            _service.CreatePayee(payee);
 
-            return CreatedAtRoute(nameof(GetPayeeById), new { Id = PayeeViewModel.Id }, PayeeViewModel);
+            PayeeViewModel payeeViewModel = _mapper.Map<PayeeViewModel>(payee);
+
+            return CreatedAtRoute(nameof(GetPayeeById), new { Id = payeeViewModel.Id }, payeeViewModel);
         }
 
-        //PUT api/payees/{id}
-        [HttpPut("{id}")]
-        public ActionResult UpdatePayee(int id, Payee payee)
+        //POST api/payees/{id}
+        [HttpPost("{id}")]
+        public ActionResult UpdatePayee(int id, CreateEditPayeeRequest request)
         {
-            Payee payeeModelFromRepo = _service.GetPayeeById(id);
-            if (payeeModelFromRepo == null)
-            {
+            Payee payee = _service.GetPayeeById(id);
+            if (payee == null)
                 return NotFound();
-            }
-            _mapper.Map(payee, payeeModelFromRepo);
 
-            _service.UpdatePayee(id, payeeModelFromRepo);
+            if (request.Id != null && request.Id != id)
+                return ValidationProblem("The ID in the model doesn't match the ID the request was made on.");
 
-            return NoContent();
-        }
-
-        //PATCH api/payees/{id}
-        [HttpPatch("{id}")]
-        public ActionResult PartialPayeeUpdate(int id, JsonPatchDocument<Payee> patchDoc)
-        {
-            var payeeModelFromRepo = _service.GetPayeeById(id);
-            if (payeeModelFromRepo == null)
-            {
-                return NotFound();
-            }
-
-            var PayeeToPatch = _mapper.Map<Payee>(payeeModelFromRepo);
-            patchDoc.ApplyTo(PayeeToPatch, ModelState);
-
-            if (!TryValidateModel(PayeeToPatch))
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            _mapper.Map(PayeeToPatch, payeeModelFromRepo);
-
-            _service.UpdatePayee(id, payeeModelFromRepo);
-
+            _service.UpdatePayee(request, payee);
             return NoContent();
         }
 
@@ -99,7 +76,7 @@ namespace PFSoftware.FinancesApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeletePayee(int id)
         {
-            var payeeModelFromRepo = _service.GetPayeeById(id);
+            Payee payeeModelFromRepo = _service.GetPayeeById(id);
             if (payeeModelFromRepo == null)
             {
                 return NotFound();

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PFSoftware.FinancesApi.Constants;
 using PFSoftware.FinancesApi.Data;
+using PFSoftware.FinancesApi.Models.Api.Requests;
 using PFSoftware.FinancesApi.Models.Domain;
 using System;
 using System.Collections.Generic;
@@ -48,13 +50,21 @@ namespace PFSoftware.FinancesApi.Services
         {
             return _context
                 .Accounts
-                .Include(x => x.Transactions)
+                .Include(x => x.Transactions).ThenInclude(x => x.MajorCategory)
+                .Include(x => x.Transactions).ThenInclude(x => x.MinorCategory)
+                .Include(x => x.Transactions).ThenInclude(x => x.Payee)
                 .FirstOrDefault(v => v.Id == id);
         }
 
-        public void UpdateAccount(int id, Account account)
+        public void UpdateAccount(CreateEditAccountRequest request, Account account)
         {
-            //Nothing
+            if (!string.IsNullOrWhiteSpace(request.Name))
+                account.Name = request.Name;
+            if (request.AccountType != AccountType.None)
+                account.AccountType = request.AccountType;
+            if (request.Transactions != null && request.Transactions.Count > 0)
+                account.Transactions = new List<FinancialTransaction>(request.Transactions);
+            _context.SaveChanges();
         }
     }
 }
